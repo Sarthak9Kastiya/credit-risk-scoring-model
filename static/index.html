@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Loan Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1>AI Loan Predictor</h1>
+            <p>Enter applicant details to instantly evaluate loan default probability using our advanced machine learning model.</p>
+        </header>
+
+        <div class="app-wrapper">
+            <form id="prediction-form" class="glass-panel">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="customer_age">Age</label>
+                        <input type="number" id="customer_age" name="customer_age" min="18" max="100" value="30" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="customer_income">Annual Income ($)</label>
+                        <input type="number" id="customer_income" name="customer_income" min="0" step="1000" value="60000" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="employment_duration">Employment Duration (Years)</label>
+                        <input type="number" id="employment_duration" name="employment_duration" min="0" step="0.5" value="5" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="cred_hist_length">Credit History Length (Years)</label>
+                        <input type="number" id="cred_hist_length" name="cred_hist_length" min="0" step="1" value="8" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loan_amnt">Loan Amount ($)</label>
+                        <input type="number" id="loan_amnt" name="loan_amnt" min="100" step="100" value="15000" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loan_int_rate">Interest Rate (%)</label>
+                        <input type="number" id="loan_int_rate" name="loan_int_rate" min="1" max="50" step="0.1" value="10.5" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="term_years">Term (Years)</label>
+                        <select id="term_years" name="term_years" required>
+                            <option value="1">1 Year</option>
+                            <option value="3">3 Years</option>
+                            <option value="5" selected>5 Years</option>
+                            <option value="10">10 Years</option>
+                            <option value="15">15 Years</option>
+                            <option value="30">30 Years</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="home_ownership">Home Ownership</label>
+                        <select id="home_ownership" name="home_ownership" required>
+                            <option value="RENT">Rent</option>
+                            <option value="OWN">Own</option>
+                            <option value="MORTGAGE" selected>Mortgage</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loan_intent">Loan Intent</label>
+                        <select id="loan_intent" name="loan_intent" required>
+                            <option value="PERSONAL" selected>Personal</option>
+                            <option value="EDUCATION">Education</option>
+                            <option value="MEDICAL">Medical</option>
+                            <option value="VENTURE">Venture</option>
+                            <option value="HOMEIMPROVEMENT">Home Improvement</option>
+                            <option value="DEBTCONSOLIDATION">Debt Consolidation</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loan_grade">Loan Grade</label>
+                        <select id="loan_grade" name="loan_grade" required>
+                            <option value="A">A</option>
+                            <option value="B" selected>B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                            <option value="G">G</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="submit-btn">
+                        <span class="btn-text">Predict Loan Status</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </div>
+            </form>
+
+            <div id="result-panel" class="glass-panel result-panel hidden">
+                <h2>Prediction Result</h2>
+                
+                <div class="status-indicator">
+                    <div id="status-icon" class="icon-circle"></div>
+                    <h3 id="status-text">Processing...</h3>
+                </div>
+
+                <div class="probability-container">
+                    <div class="prob-header">
+                        <span>Default Probability</span>
+                        <span id="prob-value">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+                
+                <button id="reset-btn" class="btn-secondary">New Prediction</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
