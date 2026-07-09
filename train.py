@@ -86,8 +86,23 @@ def main():
             'loan_grade_D', 'loan_grade_E'
         ]
         np.random.seed(42)
-        X = pd.DataFrame(np.random.randn(100, len(features)), columns=features)
-        y = np.random.randint(0, 2, size=100)
+        n_samples = 1000
+        X = pd.DataFrame(columns=features)
+        X['customer_age'] = np.random.normal(35, 10, n_samples)
+        X['customer_income'] = np.random.normal(60000, 20000, n_samples)
+        X['employment_duration'] = np.random.normal(5, 3, n_samples)
+        X['loan_amnt'] = np.random.normal(10000, 5000, n_samples)
+        X['loan_int_rate'] = np.random.normal(11, 3, n_samples)
+        X['term_years'] = np.random.choice([3, 5], n_samples)
+        X['cred_hist_length'] = np.random.normal(5, 3, n_samples)
+        
+        for col in features[7:]:
+            X[col] = np.random.choice([0, 1], n_samples, p=[0.8, 0.2])
+            
+        # Create a mock y based on features to make model slightly predictive
+        logits = -2.0 + (X['loan_amnt']/10000)*0.5 + (X['loan_int_rate']/5)*1.0 - (X['customer_income']/50000)*1.5
+        probs = 1 / (1 + np.exp(-logits))
+        y = (np.random.rand(n_samples) < probs).astype(int)
         
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
