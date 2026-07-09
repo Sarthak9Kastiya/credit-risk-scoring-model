@@ -97,21 +97,39 @@ def main():
         for col in features[7:]:
             X[col] = np.random.choice([0, 1], n_samples, p=[0.8, 0.2])
             
-        # Create a mock y based on features to make model slightly predictive
-        logits = 5.0 + (X['loan_amnt']/10000)*0.5 - (X['credit_score']/100)*1.5 - (X['customer_income']/50000)*1.5
+        # Create a mock y based on features to make model predictive and use all inputs
+        # Base logit of -1.0 gives a ~27% base default rate
+        logits = -1.0 \
+            + (35 - X['customer_age']) * 0.03 \
+            + (60000 - X['customer_income']) / 20000 * 0.5 \
+            + (5 - X['employment_duration']) * 0.1 \
+            + (X['loan_amnt'] - 10000) / 5000 * 0.6 \
+            + (700 - X['credit_score']) / 50 * 1.2 \
+            + (X['term_years'] - 3) * 0.15 \
+            + (5 - X['cred_hist_length']) * 0.1 \
+            + X['home_ownership_RENT'] * 0.4 \
+            - X['home_ownership_OWN'] * 0.4 \
+            + X['home_ownership_OTHER'] * 0.2 \
+            + X['loan_intent_VENTURE'] * 0.5 \
+            + X['loan_intent_PERSONAL'] * 0.3 \
+            + X['loan_intent_MEDICAL'] * 0.2 \
+            - X['loan_intent_EDUCATION'] * 0.1 \
+            - X['loan_intent_HOMEIMPROVEMENT'] * 0.2
+
         probs = 1 / (1 + np.exp(-logits))
         y = (np.random.rand(n_samples) < probs).astype(int)
         
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
         
-        model = LogisticRegression()
+        # Add noise and fit with strong regularization to keep probabilities soft/realistic
+        model = LogisticRegression(C=0.05, class_weight='balanced')
         model.fit(X_scaled, y)
         
         joblib.dump(model, 'model.joblib')
         joblib.dump(scaler, 'scaler.joblib')
         joblib.dump(features, 'features.joblib')
-        print("Mock artifacts generated successfully. (Please place the CSV in Downloads to train on real data)")
+        print("Mock artifacts generated successfully. All features utilized.")
 
 if __name__ == '__main__':
     main()
