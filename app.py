@@ -38,11 +38,33 @@ def predict(application: LoanApplication):
         raise HTTPException(status_code=500, detail="Model is not loaded on the server.")
         
     data = application.dict()
+    
+    # Calculate loan_grade and loan_int_rate from credit_score
+    cs = data.get('credit_score', 700)
+    if cs >= 750:
+        data['loan_grade'] = 'A'
+        data['loan_int_rate'] = 6.0
+    elif cs >= 700:
+        data['loan_grade'] = 'B'
+        data['loan_int_rate'] = 9.0
+    elif cs >= 650:
+        data['loan_grade'] = 'C'
+        data['loan_int_rate'] = 12.0
+    elif cs >= 600:
+        data['loan_grade'] = 'D'
+        data['loan_int_rate'] = 15.0
+    elif cs >= 550:
+        data['loan_grade'] = 'E'
+        data['loan_int_rate'] = 18.0
+    else:
+        data['loan_grade'] = 'F'
+        data['loan_int_rate'] = 21.0
+        
     df = pd.DataFrame([data])
     
     # Process categorical variables as done in training
-    dummies = pd.get_dummies(df[['home_ownership','loan_intent']])
-    df = df.drop(['home_ownership','loan_intent'], axis=1)
+    dummies = pd.get_dummies(df[['home_ownership','loan_intent','loan_grade']])
+    df = df.drop(['home_ownership','loan_intent','loan_grade'], axis=1)
     df = pd.concat([df, dummies], axis=1)
     
     # Ensure all columns from training are present, and in the correct order
