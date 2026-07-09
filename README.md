@@ -1,4 +1,4 @@
-# AI Loan Predictor
+# Credit Risk Scoring Model for Banks
 
 A full-stack machine learning application that predicts the probability of a loan default based on applicant details. 
 
@@ -29,8 +29,8 @@ A full-stack machine learning application that predicts the probability of a loa
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Sarthak9Kastiya/loan-prediction-app.git
-cd loan-prediction-app
+git clone https://github.com/Sarthak9Kastiya/credit-risk-scoring-model.git
+cd credit-risk-scoring-model
 ```
 
 ### 2. Create and activate a virtual environment

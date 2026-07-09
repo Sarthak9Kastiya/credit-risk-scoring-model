@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 import os
 import uvicorn
 
-app = FastAPI(title="Loan Default Prediction API")
+app = FastAPI(title="Credit Risk Scoring Model for Banks")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Load artifacts
@@ -26,12 +26,11 @@ class LoanApplication(BaseModel):
     customer_income: float
     employment_duration: float
     loan_amnt: float
-    loan_int_rate: float
+    credit_score: int
     term_years: int
     cred_hist_length: int
     home_ownership: str
     loan_intent: str
-    loan_grade: str
 
 @app.post("/api/predict")
 def predict(application: LoanApplication):
@@ -42,8 +41,8 @@ def predict(application: LoanApplication):
     df = pd.DataFrame([data])
     
     # Process categorical variables as done in training
-    dummies = pd.get_dummies(df[['home_ownership','loan_intent','loan_grade']])
-    df = df.drop(['home_ownership','loan_intent','loan_grade'], axis=1)
+    dummies = pd.get_dummies(df[['home_ownership','loan_intent']])
+    df = df.drop(['home_ownership','loan_intent'], axis=1)
     df = pd.concat([df, dummies], axis=1)
     
     # Ensure all columns from training are present, and in the correct order

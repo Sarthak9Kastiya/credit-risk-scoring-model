@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.customer_income = parseFloat(data.customer_income);
         data.employment_duration = parseFloat(data.employment_duration);
         data.loan_amnt = parseFloat(data.loan_amnt);
-        data.loan_int_rate = parseFloat(data.loan_int_rate);
+        data.credit_score = parseInt(data.credit_score);
         data.term_years = parseInt(data.term_years);
         data.cred_hist_length = parseInt(data.cred_hist_length);
 
