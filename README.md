@@ -2,7 +2,7 @@
 
 A full-stack machine learning application that predicts the probability of a loan default based on applicant details. 
 
-**Live Demo:** [https://loan-prediction-app-delta.vercel.app](https://loan-prediction-app-delta.vercel.app)
+**Live Demo:** [https://credit-risk-scoring-model-banks.vercel.app](https://credit-risk-scoring-model-banks.vercel.app)
 
 ## Features
 - **Machine Learning Model:** Utilizes a Logistic Regression model trained on financial and demographic data to evaluate loan default risk.
