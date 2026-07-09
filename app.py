@@ -10,11 +10,12 @@ import uvicorn
 
 app = FastAPI(title="Loan Default Prediction API")
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Load artifacts
 try:
-    model = joblib.load('model.joblib')
-    scaler = joblib.load('scaler.joblib')
-    features = joblib.load('features.joblib')
+    model = joblib.load(os.path.join(BASE_DIR, 'model.joblib'))
+    scaler = joblib.load(os.path.join(BASE_DIR, 'scaler.joblib'))
+    features = joblib.load(os.path.join(BASE_DIR, 'features.joblib'))
     print("Successfully loaded model artifacts.")
 except Exception as e:
     print(f"Warning: Could not load model artifacts: {e}")
