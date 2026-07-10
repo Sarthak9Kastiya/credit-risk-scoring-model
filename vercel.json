@@ -1,4 +1,5 @@
 {
+  "name": "credit-risk-scoring-model",
   "builds": [
     {
       "src": "app.py",
