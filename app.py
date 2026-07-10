@@ -41,24 +41,28 @@ def predict(application: LoanApplication):
     
     # Calculate loan_grade and loan_int_rate from credit_score
     cs = data.get('credit_score', 700)
-    if cs >= 750:
+    
+    if cs > 900:
+        return {"error": "Invalid Credit Score"}
+        
+    base_rate = 6.0
+    if 750 <= cs <= 900:
+        data['loan_int_rate'] = base_rate + 1.5
+    elif 600 <= cs < 750:
+        data['loan_int_rate'] = base_rate + 5.0
+    elif cs < 600:
+        data['loan_int_rate'] = base_rate + 10.0
+
+    if 750 < cs <= 900:
         data['loan_grade'] = 'A'
-        data['loan_int_rate'] = 6.0
-    elif cs >= 700:
+    elif 650 <= cs <= 750:
         data['loan_grade'] = 'B'
-        data['loan_int_rate'] = 9.0
-    elif cs >= 650:
+    elif 550 <= cs < 650:
         data['loan_grade'] = 'C'
-        data['loan_int_rate'] = 12.0
-    elif cs >= 600:
+    elif 300 <= cs < 550:
         data['loan_grade'] = 'D'
-        data['loan_int_rate'] = 15.0
-    elif cs >= 550:
+    elif cs < 300:
         data['loan_grade'] = 'E'
-        data['loan_int_rate'] = 18.0
-    else:
-        data['loan_grade'] = 'F'
-        data['loan_int_rate'] = 21.0
         
     df = pd.DataFrame([data])
     
@@ -78,13 +82,15 @@ def predict(application: LoanApplication):
     X_scaled = scaler.transform(df)
     
     # Predict
-    pred = model.predict(X_scaled)[0]
     prob = model.predict_proba(X_scaled)[0][1]
+    pred = 1 if prob > 0.4 else 0
     
     return {
         "prediction": int(pred),
         "status": "DEFAULT" if pred == 1 else "NO DEFAULT",
-        "probability_of_default": float(prob)
+        "probability_of_default": float(prob),
+        "interest_rate": data['loan_int_rate'],
+        "loan_grade": data['loan_grade']
     }
 
 # Mount static files for frontend
