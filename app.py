@@ -15,11 +15,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 try:
     model = joblib.load(os.path.join(BASE_DIR, 'model.joblib'))
     scaler = joblib.load(os.path.join(BASE_DIR, 'scaler.joblib'))
-    features = joblib.load(os.path.join(BASE_DIR, 'features.joblib'))
     print("Successfully loaded model artifacts.")
 except Exception as e:
     print(f"Warning: Could not load model artifacts: {e}")
-    model, scaler, features = None, None, None
+    model, scaler = None, None
 
 class LoanApplication(BaseModel):
     customer_age: int
@@ -34,63 +33,77 @@ class LoanApplication(BaseModel):
 
 @app.post("/api/predict")
 def predict(application: LoanApplication):
-    if not model or not scaler or not features:
+    if not model or not scaler:
         raise HTTPException(status_code=500, detail="Model is not loaded on the server.")
         
     data = application.dict()
+    x = np.zeros(19)
     
-    # Calculate loan_grade and loan_int_rate from credit_score
     cs = data.get('credit_score', 700)
-    
     if cs > 900:
         return {"error": "Invalid Credit Score"}
         
+    x[0] = data['customer_age']
+    x[1] = data['customer_income']
+    x[2] = data['employment_duration']
+    x[3] = data['loan_amnt']
+    
     base_rate = 6.0
     if 750 <= cs <= 900:
-        data['loan_int_rate'] = base_rate + 1.5
+        loan_int_rate = base_rate + 1.5
     elif 600 <= cs < 750:
-        data['loan_int_rate'] = base_rate + 5.0
+        loan_int_rate = base_rate + 5.0
     elif cs < 600:
-        data['loan_int_rate'] = base_rate + 10.0
-
-    if 750 < cs <= 900:
-        data['loan_grade'] = 'A'
-    elif 650 <= cs <= 750:
-        data['loan_grade'] = 'B'
-    elif 550 <= cs < 650:
-        data['loan_grade'] = 'C'
-    elif 300 <= cs < 550:
-        data['loan_grade'] = 'D'
-    elif cs < 300:
-        data['loan_grade'] = 'E'
+        loan_int_rate = base_rate + 10.0
         
-    df = pd.DataFrame([data])
+    x[4] = loan_int_rate
+    x[5] = data['term_years']
+    x[6] = data['cred_hist_length']
     
-    # Process categorical variables as done in training
-    dummies = pd.get_dummies(df[['home_ownership','loan_intent','loan_grade']])
-    df = df.drop(['home_ownership','loan_intent','loan_grade'], axis=1)
-    df = pd.concat([df, dummies], axis=1)
-    
-    # Ensure all columns from training are present, and in the correct order
-    for col in features:
-        if col not in df.columns:
-            df[col] = 0
-            
-    df = df[features] # reorder to match exact feature set
-    
-    # Scale
-    X_scaled = scaler.transform(df)
-    
-    # Predict
-    prob = model.predict_proba(X_scaled)[0][1]
+    home_ownership = data.get('home_ownership', '')
+    if home_ownership == 'MORTGAGE':
+        x[7] = 1
+    if home_ownership == 'OWN':
+        x[8] = 1
+    if home_ownership == 'RENT':
+        x[9] = 1
+        
+    loan_intent = data.get('loan_intent', '')
+    if loan_intent == 'EDUCATION':
+        x[10] = 1
+    if loan_intent == 'HOMEIMPROVEMENT':
+        x[11] = 1
+    if loan_intent == 'MEDICAL':
+        x[12] = 1
+    if loan_intent == 'PERSONAL':
+        x[13] = 1
+    if loan_intent == 'VENTURE':
+        x[14] = 1
+        
+    loan_grade = 'A'
+    if 650 <= cs <= 750:
+        x[15] = 1
+        loan_grade = 'B'
+    elif 550 <= cs < 650:
+        x[16] = 1
+        loan_grade = 'C'
+    elif 300 <= cs < 550:
+        x[17] = 1
+        loan_grade = 'D'
+    elif cs < 300:
+        x[18] = 1
+        loan_grade = 'E'
+        
+    x_scaled = scaler.transform([x])
+    prob = model.predict_proba(x_scaled)[0][1]
     pred = 1 if prob > 0.4 else 0
     
     return {
         "prediction": int(pred),
         "status": "DEFAULT" if pred == 1 else "NO DEFAULT",
         "probability_of_default": float(prob),
-        "interest_rate": data['loan_int_rate'],
-        "loan_grade": data['loan_grade']
+        "interest_rate": loan_int_rate,
+        "loan_grade": loan_grade
     }
 
 # Mount static files for frontend
